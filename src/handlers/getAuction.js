@@ -25,7 +25,7 @@ async function getAuction(event, context) {
   }
 
   return {
-    statusCode: 201,
+    statusCode: 200,
     body: JSON.stringify({ auction }),
   };
 
