@@ -30,7 +30,7 @@ async function createAuction(event, context) {
 
   return {
     statusCode: 201,
-    body: JSON.stringify({ auction }),
+    body: JSON.stringify(auction),
   };
 }
 
