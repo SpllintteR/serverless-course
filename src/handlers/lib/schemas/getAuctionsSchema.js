@@ -11,7 +11,7 @@ const schema = {
             }
         }
     },
-    required: ['queryStringParameters'  ]
+    required: ['queryStringParameters']
 };
 
 export default schema;
