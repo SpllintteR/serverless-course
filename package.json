@@ -1,7 +1,7 @@
 {
   "name": "auction-service",
   "version": "1.0.0",
-  "description": "Codingly template for Serverless Framework projects",
+  "description": "Auctions service from serverless framework course",
   "author": "Paulo Weber",
   "license": "MIT",
   "devDependencies": {
