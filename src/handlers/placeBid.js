@@ -10,6 +10,7 @@ const dynamoDB = new AWS.DynamoDB.DocumentClient();
 async function placeBid(event, context) {
   const { id } = event.pathParameters;
   const { amount } = event.body;
+  const { email } = event.requestContext.authorizer;
 
   const auction = await getAuctionById(id);
   if (amount <= auction.highestBid.amount) {
@@ -18,13 +19,20 @@ async function placeBid(event, context) {
   if (auction.status !== 'OPEN') {
     throw new createError.Forbidden('Your cannot bid on closed Auctions');
   }
+  if (auction.seller === email) {
+    throw new createError.Forbidden(`You shouldn't bid on your own Auctions`);
+  }
+  if (auction.highestBid.bidder === email) {
+    throw new createError.Forbidden(`You're already the highest bidder, you can't increase your bid`);
+  }
 
   const params = {
     TableName: process.env.AUCTIONS_TABLE_NAME,
     Key: { id },
-    UpdateExpression: 'set highestBid.amount = :amount',
+    UpdateExpression: 'set highestBid.amount = :amount, highestBid.bidder = :bidder',
     ExpressionAttributeValues: {
-      ':amount': amount
+      ':amount': amount,
+      ':bidder': email
     },
     ReturnValues: 'ALL_NEW'
   };
