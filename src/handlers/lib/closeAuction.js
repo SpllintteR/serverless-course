@@ -22,21 +22,30 @@ export async function closeAuction(auction) {
     const { title, seller, highestBid } = auction;
     const { amount, bidder } = highestBid;
 
-    const notifySeller = sqs.sendMessage({
-        QueueUrl: process.env.MAIL_QUEUE_URL,
-        MessageBody: JSON.stringify({
-            subject:"Your Item has been sold",
-            body:`Item ${title} has been sold for ${amount}`,
-            recipient: seller})
-    }).promise();
+    if (amount > 0) {
+        const notifySeller = sqs.sendMessage({
+            QueueUrl: process.env.MAIL_QUEUE_URL,
+            MessageBody: JSON.stringify({
+                subject:"Your Item has been sold",
+                body:`Item ${title} has been sold for ${amount}`,
+                recipient: seller})
+        }).promise();
 
-    const notifyBidder = sqs.sendMessage({
-        QueueUrl: process.env.MAIL_QUEUE_URL,
-        MessageBody: JSON.stringify({
-            subject:"Your bid won the auction",
-            body:`Your bid of ${amount} on the Item ${title} is the highest, congratulations`,
-            recipient: bidder})
-    }).promise();
-
-    return Promise.all([notifySeller, notifyBidder]);
+        const notifyBidder = sqs.sendMessage({
+            QueueUrl: process.env.MAIL_QUEUE_URL,
+            MessageBody: JSON.stringify({
+                subject:"Your bid won the auction",
+                body:`Your bid of ${amount} on the Item ${title} is the highest, congratulations`,
+                recipient: bidder})
+        }).promise();
+        return Promise.all([notifySeller, notifyBidder]);
+    } else {
+        return sqs.sendMessage({
+            QueueUrl: process.env.MAIL_QUEUE_URL,
+            MessageBody: JSON.stringify({
+                subject:"Your auction has no bidder",
+                body:`Item ${title} hasn't been sold because no one bid on it`,
+                recipient: seller})
+        }).promise();
+    }
 }
