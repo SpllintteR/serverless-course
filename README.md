@@ -3,3 +3,4 @@ Repository to push auctions service from https://www.udemy.com/course/serverless
 - Serverless framework
 - DynamoDB
 - Lambdas in Node.js
+- S3
